@@ -4,29 +4,11 @@ import {
     post,
     contentType,
   } from 'https://denopkg.com/syumai/dinatra/mod.ts';
-
-
-interface rule {
-  title?: string;
-  body?: string;
-  diff?: string;
-  channel: string
-}
+import { AppConfig, loadConfig } from './config.ts';
+import { useMatcher } from "./rule.ts";
 
 function fetchPageText(title: string) {
   return `featchedbody of ${title}`
-}
-
-export function useMatcher(rules: rule[]) : ((title : string, body : string, diff : string) => string[]) {
-  return (title : string, body : string, diff : string): string[] => {
-    const channels = [];
-
-    return rules.filter(rule => {
-      return title.indexOf(rule.title) >= 0 || 
-      body.indexOf(rule.body) >= 0 ||
-      diff.indexOf(rule.diff) >= 0
-    }).map(rule => rule.channel)
-  }
 }
 
 async function postToSlack(url: string, options: {attachment: {}, channel?: string}) {
@@ -40,19 +22,6 @@ async function postToSlack(url: string, options: {attachment: {}, channel?: stri
     body
   })
   console.log({ response: response.json(), body }, '\n')
-}
-
-interface AppConfig {
-  port: string,
-  scrapbox?: {
-    host: string,
-    project: string,
-    cookie: string
-  },
-  slack?: {
-    webhook: string
-  },
-  rules?: rule[]
 }
 
 export function App(config: AppConfig): Dinatra {
@@ -86,7 +55,7 @@ export function App(config: AppConfig): Dinatra {
     ])
   ]
 
-  const app = new Dinatra(config.port)
+  const app = new Dinatra(config.server.port)
   app.handle(...handlers)
   return app
 }
@@ -94,7 +63,10 @@ export function App(config: AppConfig): Dinatra {
 
 // main
 if(import.meta.main) {
-  const PORT = Deno.env()['PORT'] || '8080'
-  const app = App({port: PORT});
-  app.serve();
+  (async() => {
+    const config = await loadConfig('config.toml')
+    config.server.port = Deno.env()['PORT'] || config.server.port || '8080' // ENV > toml > 8080
+    const app = App(config);
+    app.serve();
+  })()
 }

@@ -4,7 +4,9 @@ import { App } from "../src/server.ts";
 const { exit } = Deno;
 
 const testApp = App({
-    port: '8001',
+    server: {
+        port: '8001'
+    },
     rules: [
         {body: "body", channel: "#body_notice"},
         {title: "New Page", channel: "#title_notice"}

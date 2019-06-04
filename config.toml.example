@@ -1,0 +1,18 @@
+[server]
+port = 8080
+
+[scrapbox]
+host = 'https://scrapbox.io'
+project = 'mactkg-pub'
+cookie = ''
+
+[slack]
+webhook = ''
+
+[[rules]]
+body = "#nikki"
+channel = "#nikki_notice"
+
+[[rules]]
+diff = ".icon"
+channel = "#comment_notice"

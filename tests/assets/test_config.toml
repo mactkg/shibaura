@@ -1,0 +1,11 @@
+[server]
+port = 8080
+
+[scrapbox]
+host = 'https://scrapbox.io'
+project = 'deno-ja'
+cookie = ''
+
+[[rules]]
+diff = ".icon"
+channel = "#comment_notice"
