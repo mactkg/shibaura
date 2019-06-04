@@ -4,5 +4,5 @@ run: build
 build: Dockerfile src tests
 	docker build -t shibaura .
 
-test: build
-	docker run --rm -t shibaura deno run -A ./tests/server.ts
+test: tests src
+	ls ./tests/*.ts | xargs -I_ deno run -A _
