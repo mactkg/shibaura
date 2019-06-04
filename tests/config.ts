@@ -27,7 +27,6 @@ test({
 });
 
 (async () => {
-    console.log(import.meta.url)
     await runTests();
     exit(0);
 })();
