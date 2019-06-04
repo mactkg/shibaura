@@ -6,23 +6,8 @@ import {
   } from 'https://denopkg.com/syumai/dinatra/mod.ts';
 import { AppConfig, loadConfig } from './config.ts';
 import { useMatcher } from "./rule.ts";
-
-function fetchPageText(title: string) {
-  return `featchedbody of ${title}`
-}
-
-async function postToSlack(url: string, options: {attachment: {}, channel?: string}) {
-  const body = JSON.stringify({
-    attachments: [options.attachment],
-    channel: options.channel
-  })
-
-  const response = await fetch(url, {
-    method: "POST",
-    body
-  })
-  console.log({ response: response.json(), body }, '\n')
-}
+import { postToSlack } from "./slack.ts";
+import { fetchPageText } from "./scrapbox.ts";
 
 export function App(config: AppConfig): Dinatra {
   const matcher = useMatcher(config.rules)
