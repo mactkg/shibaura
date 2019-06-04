@@ -1,6 +1,6 @@
 import { test, runTests } from 'https://deno.land/std/testing/mod.ts';
 import { assertEquals, assertArrayContains } from 'https://deno.land/std/testing/asserts.ts';
-import { App } from "./server.ts";
+import { App } from "../src/server.ts";
 const { exit } = Deno;
 
 const testApp = App({
