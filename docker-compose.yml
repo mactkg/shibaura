@@ -2,7 +2,14 @@ version: '3'
 
 services:
   deno:
-    build:
-      context: .
+    image: maxmcd/deno:slim
+    command: deno run -A /shibaura/src/server.ts
     ports:
       - 8080:8080
+    volumes:
+      - .:/shibaura
+      - empty:/shibaura/node_modules
+    working_dir: /shibaura
+volumes:
+  empty:
+    driver: 'local'
