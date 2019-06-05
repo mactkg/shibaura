@@ -1,8 +1,11 @@
 FROM maxmcd/deno:slim
 
-COPY . .
+WORKDIR /shibaura
+COPY src ./src
+COPY tests ./tests
+COPY config.toml ./
 
-RUN deno fetch ./src/server.ts
+RUN deno fetch /shibaura/src/server.ts
 
 EXPOSE 8080
-CMD deno run -A ./src/server.ts
+CMD deno run -A /shibaura/src/server.ts
