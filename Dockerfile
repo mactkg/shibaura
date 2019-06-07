@@ -7,5 +7,6 @@ COPY config.toml ./
 
 RUN deno fetch /shibaura/src/server.ts
 
+ENV PORT 8080
 EXPOSE 8080
 CMD deno run -A /shibaura/src/server.ts
