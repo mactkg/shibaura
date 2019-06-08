@@ -8,5 +8,5 @@ export async function postToSlack(url: string, options: {attachment: {}, channel
         method: "POST",
         body
     })
-    console.log({ response: response.json(), body }, '\n')
+    console.log("Notified:", { response: response.json(), body }, '\n')
 }
