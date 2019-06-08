@@ -16,7 +16,8 @@ const testApp = App({
         {title: "shibaura test", channel: "#title_notice"},
         {diff: "diffdiff", channel: "#diff_notice"},
         {body: "#body", channel: "#body_notice"},
-        {title: "shibaura test", diff: "if", channel: "#complex_notice"}
+        {title: "shibaura test", diff: "if", channel: "#complex_notice"},
+        {diff: ".icon", channel: "#comment_notice"}
     ]
 });
 testApp.serve();
@@ -40,18 +41,32 @@ test({
     name: "matcher test",
     async fn() {
         const body = JSON.stringify({
-            attachments: [
+            "text":"New lines on <https://scrapbox.io/mactkg-pub/|mactkg-pub>",
+            "mrkdwn":true,
+            "username":"Scrapbox",
+            "attachments":[
                 {
-                    title: "shibaura test",
-                    rawText: "diffdiff"
+                    "title":"shibaura test",
+                    "title_link":"https://scrapbox.io/mactkg-pub/shibaura_test#5cfb1e5f5e52790000aab5d0",
+                    "text":"diffdiff\n<https://scrapbox.io/mactkg-pub/body|#body>",
+                    "rawText":"diffdiff\n#body",
+                    "mrkdwn_in":["text"],
+                    "author_name":"Kenta Hara"
+                },
+                {
+                    "title":"test page",
+                    "title_link":"https://scrapbox.io/mactkg-pub/test_page#5cf7bf77d9a6e100175758b9",
+                    "text":"test page\n<https://scrapbox.io/mactkg-pub/bookmark|#bookmark> again how about this  *mactkg* ",
+                    "rawText":"test page\n#bookmark again how about this [mactkg.icon]",
+                    "mrkdwn_in":["text"],
+                    "author_name":"Kenta Hara"
                 }
             ]
         })
-
         const result = await fetch('http://localhost:8001/scrapbox', {
             method: "POST",
             headers: [
-                ["Content-Type", "application/json"]
+                ["Content-Type", "application/json;charset=utf-8"]
             ],
             body
         })
@@ -59,7 +74,9 @@ test({
         const json = await result.json()
         assertEquals(result.status, 200)
         assertEquals(json[0].title, "shibaura test")
-        assertArrayContains(json[0].channels, ["#body_notice", "#title_notice", "#diff_notice", "#complex_notice"])
+        assertEquals(json[1].title, "test page")
+        assertArrayContains(json[0].channels, ["#title_notice", "#diff_notice", "#body_notice","#complex_notice"])
+        assertArrayContains(json[1].channels, ["#comment_notice"])
     }
 });
 
