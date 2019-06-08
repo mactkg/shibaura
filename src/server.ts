@@ -23,10 +23,10 @@ export function App(config: AppConfig): Dinatra {
         const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title))
         const channels = matcher(title, body, diff)
 
-        channels.forEach(async ch => {
+        await Promise.all(channels.map(async ch => {
           const url = config.slack ? config.slack.webhook : 'https://httpbin.org/post'
           await postToSlack(url, { attachment, channel: ch})
-        })
+        }))
 
         return { title, channels }
       }));
