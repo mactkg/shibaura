@@ -4,22 +4,23 @@ import {
     post,
     contentType,
   } from 'https://denopkg.com/syumai/dinatra/mod.ts';
+import { Response } from "https://denopkg.com/syumai/dinatra/response.ts";
 import { AppConfig, loadConfig } from './config.ts';
 import { useMatcher } from "./rule.ts";
 import { postToSlack } from "./slack.ts";
-import { fetchPageText } from "./scrapbox.ts";
+import { fetchPageText, buildPageURL } from "./scrapbox.ts";
 
 export function App(config: AppConfig): Dinatra {
   const matcher = useMatcher(config.rules)
   const handlers = [
-    post('/scrapbox', ({ params }) => {
+    post('/scrapbox', async ({ params }) : Promise<number | Response> => {
       if(!(params.attachments instanceof Array)) {
         return 400
       }
 
-      const channels = params.attachments.flatMap(attachment => {
+      const results = await Promise.all(params.attachments.flatMap(async attachment => {
         const { title, rawText: diff } = attachment
-        const body = fetchPageText(title)
+        const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title))
         const channels = matcher(title, body, diff)
 
         channels.forEach(async ch => {
@@ -27,10 +28,9 @@ export function App(config: AppConfig): Dinatra {
           await postToSlack(url, { attachment, channel: ch})
         })
 
-        return channels
-      });
-
-      return [200, contentType('json'), JSON.stringify(channels)]
+        return { title, channels }
+      }));
+      return [200, contentType('json'), JSON.stringify(results)]
     }),
 
     get('/info', () => [

@@ -7,9 +7,16 @@ const testApp = App({
     server: {
         port: '8001'
     },
+    scrapbox: {
+        host: 'https://scrapbox.io',
+        project: 'mactkg-pub',
+        cookie: ''
+    },
     rules: [
-        {body: "body", channel: "#body_notice"},
-        {title: "New Page", channel: "#title_notice"}
+        {title: "shibaura test", channel: "#title_notice"},
+        {diff: "diffdiff", channel: "#diff_notice"},
+        {body: "#body", channel: "#body_notice"},
+        {title: "shibaura test", diff: "if", channel: "#complex_notice"}
     ]
 });
 testApp.serve();
@@ -35,7 +42,7 @@ test({
         const body = JSON.stringify({
             attachments: [
                 {
-                    title: "New Page",
+                    title: "shibaura test",
                     rawText: "diffdiff"
                 }
             ]
@@ -49,8 +56,10 @@ test({
             body
         })
 
+        const json = await result.json()
         assertEquals(result.status, 200)
-        assertArrayContains(await result.json(), ["#body_notice", "#title_notice"])
+        assertEquals(json[0].title, "shibaura test")
+        assertArrayContains(json[0].channels, ["#body_notice", "#title_notice", "#diff_notice", "#complex_notice"])
     }
 });
 
