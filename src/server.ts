@@ -20,7 +20,7 @@ export function App(config: AppConfig): Dinatra {
 
       const results = await Promise.all(params.attachments.flatMap(async attachment => {
         const { title, rawText: diff } = attachment
-        const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title))
+        const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title), config.scrapbox.cookie)
         const channels = matcher(title, body, diff)
 
         await Promise.all(channels.map(async ch => {
