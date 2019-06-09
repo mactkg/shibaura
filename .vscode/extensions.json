@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "justjavac.vscode-deno",
+    "dbaeumer.vscode-eslint"
+  ]
+}
