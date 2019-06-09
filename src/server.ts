@@ -5,12 +5,12 @@ import {
   contentType
 } from 'https://denopkg.com/syumai/dinatra/mod.ts'
 import { Response } from 'https://denopkg.com/syumai/dinatra/response.ts'
-import { AppConfig, getConfig } from './config.ts'
+import { Config, getConfig } from './config.ts'
 import { useMatcher } from './rule.ts'
 import { postToSlack } from './slack.ts'
 import { fetchPageText, buildPageURL } from './scrapbox.ts'
 
-export function App (config: AppConfig): Dinatra {
+export function App (config: Config): Dinatra {
   const matcher = useMatcher(config.rules)
   const handlers = [
     post('/scrapbox', async ({ params }) : Promise<number | Response> => {
@@ -18,6 +18,7 @@ export function App (config: AppConfig): Dinatra {
         return 400
       }
 
+      await config.getConfig() // refetch config
       const results = await Promise.all(params.attachments.flatMap(async attachment => {
         const { title, rawText: diff } = attachment
         const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title), config.scrapbox.cookie)

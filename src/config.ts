@@ -23,7 +23,7 @@ export interface AppConfig {
   }
 }
 
-class Config implements AppConfig {
+export class Config implements AppConfig {
   public server
   public scrapbox
   public slack
@@ -52,7 +52,7 @@ class Config implements AppConfig {
     }, config.external)
   }
 
-  async getConfig (): Promise<AppConfig> {
+  async getConfig (): Promise<Config> {
     this.rules = [ ...this.originalConfig.rules, ...(await this.fetchRules()) ]
     return this
   }
@@ -95,7 +95,7 @@ export function changeConfigForTesting (configForTest: AppConfig) {
   globalConfig = new Config(configForTest)
 }
 
-export async function getConfig (): Promise<AppConfig> {
+export async function getConfig (): Promise<Config> {
   if (!globalConfig) {
     globalConfig = new Config(localConfig)
   }
