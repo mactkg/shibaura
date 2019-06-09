@@ -1,20 +1,20 @@
 import {
-    App as Dinatra,
-    get,
-    post,
-    contentType,
-  } from 'https://denopkg.com/syumai/dinatra/mod.ts';
-import { Response } from "https://denopkg.com/syumai/dinatra/response.ts";
-import { AppConfig, getConfig } from './config.ts';
-import { useMatcher } from "./rule.ts";
-import { postToSlack } from "./slack.ts";
-import { fetchPageText, buildPageURL } from "./scrapbox.ts";
+  App as Dinatra,
+  get,
+  post,
+  contentType
+} from 'https://denopkg.com/syumai/dinatra/mod.ts'
+import { Response } from 'https://denopkg.com/syumai/dinatra/response.ts'
+import { AppConfig, getConfig } from './config.ts'
+import { useMatcher } from './rule.ts'
+import { postToSlack } from './slack.ts'
+import { fetchPageText, buildPageURL } from './scrapbox.ts'
 
-export function App(config: AppConfig): Dinatra {
+export function App (config: AppConfig): Dinatra {
   const matcher = useMatcher(config.rules)
   const handlers = [
     post('/scrapbox', async ({ params }) : Promise<number | Response> => {
-      if(!(params.attachments instanceof Array)) {
+      if (!(params.attachments instanceof Array)) {
         return 400
       }
 
@@ -25,18 +25,18 @@ export function App(config: AppConfig): Dinatra {
 
         await Promise.all(channels.map(async ch => {
           const url = config.slack ? config.slack.webhook : 'https://httpbin.org/post'
-          await postToSlack(url, { attachment, channel: ch})
+          await postToSlack(url, { attachment, channel: ch })
         }))
 
         return { title, channels }
-      }));
+      }))
       return [200, contentType('json'), JSON.stringify(results)]
     }),
 
     get('/info', () => [
       200,
       contentType('json'),
-      JSON.stringify({ app: 'dinatra', version: '0.0.1' }),
+      JSON.stringify({ app: 'dinatra', version: '0.0.1' })
     ])
   ]
 
@@ -45,12 +45,11 @@ export function App(config: AppConfig): Dinatra {
   return app
 }
 
-
 // main
-if(import.meta.main) {
-  (async() => {
+if (import.meta.main) {
+  (async () => {
     const config = await getConfig()
-    const app = App(config);
-    app.serve();
+    const app = App(config)
+    app.serve()
   })()
 }
