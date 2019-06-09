@@ -5,7 +5,7 @@ import localConfig from '../config.ts'
 // interface of config from user
 export interface AppConfig {
   server: {
-    port: string | number;
+    port: string;
   };
   scrapbox?: {
     host: string;
@@ -17,69 +17,53 @@ export interface AppConfig {
   };
   rules?: Rule[];
   external?: {
-    rules?: {
-      scrapboxCsv?: string
-    }
-  }
+    ruleScrapboxUrl?: string;
+  };
 }
 
 export class Config implements AppConfig {
+  // public for testing...
   public server
   public scrapbox
   public slack
   public rules
   public external
 
-  private originalConfig: AppConfig
+  private original: AppConfig
   private lastCSVFetched: number = 0
-  private fetchedRules: Rule[]
+  private fetchedRules: Rule[] = []
 
   constructor (config: AppConfig) {
-    this.originalConfig = config
-    const env = Deno.env()
-
-    this.server = { port: env['PORT'] || config.server.port || '8080' }
-    this.scrapbox = Object.assign({
-      host: env['SCRAPBOX_HOST'],
-      project: env['SCRAPBOX_PROJECT'],
-      cookie: env['SCRAPBOX_COOKIE']
-    }, config.scrapbox)
-    this.slack = Object.assign({ webhook: env['SLACK_WEBHOOK_URL'] }, config.slack)
-    this.external = Object.assign({
-      rules: {
-        scrapboxCsv: env['EXTERNAL_RULE_CSV']
-      }
-    }, config.external)
+    this.original = config
+    this.server = config.server || {}
+    this.scrapbox = config.scrapbox || {}
+    this.slack = config.slack || {}
+    this.rules = config.rules || []
+    this.external = config.external || {}
   }
 
   async getConfig (): Promise<Config> {
-    this.rules = [ ...this.originalConfig.rules, ...(await this.fetchRules()) ]
+    this.rules = [ ...(this.original.rules || []), ...(await this.fetchRules()) ]
     return this
   }
 
   private async fetchRules () {
-    if (!('scrapboxCsv' in this.originalConfig.external.rules)) {
+    if (!this.external.ruleScrapboxUrl) {
       return []
     }
     if (Date.now() - this.lastCSVFetched < 5000) {
       return this.fetchedRules
     }
 
-    const cookie = this.originalConfig.scrapbox ? this.originalConfig.scrapbox.cookie : ''
-    const res = await fetch(this.originalConfig.external.rules.scrapboxCsv, {
+    const res = await fetch(this.external.ruleScrapboxUrl, {
       headers: {
-        'Cookie': `connect.sid=${cookie}`
+        'Cookie': `connect.sid=${this.scrapbox.cookie || ''}`
       }
     })
 
     if (res.ok) {
-      const data = await parse(await res.text(), { header: true })
-      const rules = data.map(r => {
-        const row = r as object // FIXME: how treat 'unknown' object?
-        return { title: row['title'], body: row['body'], diff: row['diff'], channel: row['channel'] }
-      })
-      this.fetchedRules = rules
-      console.debug(`Fetched ${this.fetchedRules.length} rules:`, rules.map(r => {
+      this.fetchedRules = await this.parseCSV(await res.text())
+      console.debug(`Fetched ${this.fetchedRules.length} rules:`, this.fetchedRules.map(r => {
         return JSON.stringify(r)
       }).join('\n'))
     } else {
@@ -89,12 +73,23 @@ export class Config implements AppConfig {
     this.lastCSVFetched = Date.now()
     return this.fetchedRules
   }
+
+  private async parseCSV(csv: string): Promise<Rule[]> {
+    const data = await parse(csv, { header: true }).catch((e) => {
+      console.error(`ParseError: ${e}`)
+      return [] as unknown[]
+    })
+    const rules = data.map(r => {
+      const row = r as object // FIXME: how treat 'unknown' object?
+      return { title: row['title'], body: row['body'], diff: row['diff'], channel: row['channel'] }
+    })
+    return rules
+  }
 }
 
-let globalConfig
-
-export function changeConfigForTesting (configForTest: AppConfig) {
-  globalConfig = new Config(configForTest)
+let globalConfig: Config
+export function changeConfigForTesting(customConfig: AppConfig) {
+  globalConfig = new Config(customConfig)
 }
 
 export async function getConfig (): Promise<Config> {
@@ -103,3 +98,4 @@ export async function getConfig (): Promise<Config> {
   }
   return globalConfig.getConfig()
 }
+

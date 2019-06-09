@@ -1,25 +1,19 @@
 import { AppConfig } from "./src/config.ts";
 
+const env = Deno.env()
 const config: AppConfig = {
     server: {
-        port: 8080
+        port: env['PORT'] || '8080'
     },
     scrapbox: {
-        host: "https://scrapbox.io",
-        project: "mactkg-pub",
-        cookie: ""
+        host: env['SCRAPBOX_HOST'] || 'https://scrapbox.io',
+        project: env['SCRAPBOX_PROJECT'] || 'mactkg-pub',
+        cookie: env["SCRAPBOX_COOKIE"] || ""
     },
     slack: {
-        webhook: ""
+        webhook: env["SLACK_WEBHOOK"] || ''
     },
-    rules: [
-        { body: "#nikki", channel: "#nikki_notice" },
-        { diff: ".icon", channel: "#comment_notice" }
-    ],
-    external: {
-        rules: {
-            scrapboxCsv: ""
-        }
-    }
-};
+    external: {}
+}
+config.external.ruleScrapboxUrl = env["EXTERNAL_RULE_URL"] || `https://scrapbox.io/api/table/${config.scrapbox.host}/shibaura/settings.csv`
 export default config;

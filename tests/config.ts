@@ -9,30 +9,19 @@ const { exit } = Deno
 test({
   name: 'parse collectly',
   async fn () {
-    const data: AppConfig = {
+    changeConfigForTesting({
       server: {
-        port: 8080
+        port: "8080"
       },
-      rules: [{ title: 'test', channel: '#test' }],
       external: {
-        rules: {
-          scrapboxCsv:
-            'https://scrapbox.io/api/table/mactkg-pub/shibaura_config_for_test/settings.csv'
-        }
+        ruleScrapboxUrl: 'https://scrapbox.io/api/table/mactkg-pub/shibaura_config_for_test/settings.csv'
       }
-    }
-    changeConfigForTesting(data)
+    })
 
     const config = await getConfig()
-    assertEquals(config.server.port, 8080)
+    assertEquals(config.server.port, "8080")
     assertEquals(config.slack.webhook, undefined)
-    assertEquals(config.rules.length, 3)
-    assert(
-      config.rules.findIndex(r => {
-        return r.title === 'test' && r.channel === '#test'
-      }) >= 0,
-      'rule from config.ts'
-    )
+    assertEquals(config.rules.length, 2)
     assert(
       config.rules.findIndex(r => {
         return r.diff === '.icon' && r.channel === '#sc_comment'
@@ -45,28 +34,17 @@ test({
 test({
   name: 'missed csv but ok',
   async fn () {
-    const data: AppConfig = {
+    changeConfigForTesting({
       server: {
-        port: 8080
+        port: "8080"
       },
-      rules: [{ title: 'test', channel: '#test' }],
       external: {
-        rules: {
-          scrapboxCsv:
-            'https://scrapbox.io/api/table/mactkg-pub/shibaura_config_for_test/settings_maybe_not_found.csv'
-        }
+        ruleScrapboxUrl: 'https://scrapbox.io/api/table/mactkg-pub/shibaura_config_for_test/settings_maybe_not_found.csv'
       }
-    }
-    changeConfigForTesting(data)
+    })
 
     const config = await getConfig()
-    assertEquals(config.server.port, 8080)
-    assert(
-      config.rules.findIndex(r => {
-        return r.title === 'test' && r.channel === '#test'
-      }) >= 0,
-      'rule from config.ts'
-    )
+    assertEquals(config.rules.length, 0)
   }
 });
 
