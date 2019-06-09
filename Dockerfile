@@ -3,7 +3,7 @@ FROM maxmcd/deno:slim
 WORKDIR /shibaura
 COPY src ./src
 COPY tests ./tests
-COPY config.toml ./
+COPY config.ts ./
 
 RUN deno fetch /shibaura/src/server.ts
 
