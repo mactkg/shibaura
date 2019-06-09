@@ -5,7 +5,7 @@ import {
     contentType,
   } from 'https://denopkg.com/syumai/dinatra/mod.ts';
 import { Response } from "https://denopkg.com/syumai/dinatra/response.ts";
-import { AppConfig, loadConfig } from './config.ts';
+import { AppConfig, getConfig } from './config.ts';
 import { useMatcher } from "./rule.ts";
 import { postToSlack } from "./slack.ts";
 import { fetchPageText, buildPageURL } from "./scrapbox.ts";
@@ -40,7 +40,7 @@ export function App(config: AppConfig): Dinatra {
     ])
   ]
 
-  const app = new Dinatra(config.server.port)
+  const app = new Dinatra(String(config.server.port))
   app.handle(...handlers)
   return app
 }
@@ -49,8 +49,7 @@ export function App(config: AppConfig): Dinatra {
 // main
 if(import.meta.main) {
   (async() => {
-    const config = await loadConfig('config.toml')
-    config.server.port = Deno.env()['PORT'] || config.server.port || '8080' // ENV > toml > 8080
+    const config = await getConfig()
     const app = App(config);
     app.serve();
   })()
