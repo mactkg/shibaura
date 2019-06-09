@@ -79,7 +79,9 @@ export class Config implements AppConfig {
         return { title: row['title'], body: row['body'], diff: row['diff'], channel: row['channel'] }
       })
       this.fetchedRules = rules
-      console.info(`Fetched ${this.fetchedRules.length} rules\n`)
+      console.debug(`Fetched ${this.fetchedRules.length} rules:`, rules.map(r => {
+        return JSON.stringify(r)
+      }).join('\n'))
     } else {
       this.fetchedRules = this.fetchedRules || []
     }
