@@ -20,10 +20,10 @@ Docker Imageに設定ファイル `config.ts` を内蔵してデプロイする�
 - `make run` で動きます。`ngrok`などのツールを使ってインターネットへ公開し、試してみるといいでしょう。
 - Docker使っていないひとは、`deno` が動くようにして、 `deno run ./src/server.ts` します。
 
-### Docker Containerがデプロイ出来る環境で起動したいひと
-- `make build` でImageをBuildするので、そのままDeployすればうごきます。ポートは8080に指定してあります。
+#### Docker Containerがデプロイ出来る環境で起動したいひと
+- `make build` でDocker ImageをBuildするので、そのままデプロイすればうごきます。ポートは8080に指定してあります。
 
-### GCP Cloud Runで起動したいひと（筆者のやりかた）
+#### GCP Cloud Runで起動したいひと（筆者のやりかた）
 - MakefileにはGCPのCloud Runへデプロイするタスクが設定してあります。これを使えば、Cloud Runにデプロイできます。
 - GCPのプロジェクトを作って、プロジェクト名をメモしておきます。
 - 次の環境変数を設定してください。
@@ -31,6 +31,9 @@ Docker Imageに設定ファイル `config.ts` を内蔵してデプロイする�
   - `GCP_CLOUD_RUN_SERVICE_NAME`: Cloud Runのサービスの名前
   - `GCP_IMAGE_NAME`=デプロイするDocker Imageを上げる先。 きっと `gcr.io/${GCP_PROJECT}/${GCP_CLOUD_RUN_SERVICE_NAME}`
 - `$ make deploy_cloud_run`
+
+#### Herokuで起動したいひと
+- 誰かいい感じの `app.config` 求む！
 
 ## 処理ルールについて
 基本 [june29/takanawa](https://github.com/june29/takanawa) のように動作しますが、処理ルールの書き方が違います。
@@ -46,3 +49,17 @@ Scrapboxに任意の設定用ページを作り、そのページに処理ルー
 - `diff` 列: 変更行がこの文字列にマッチしたときに通知
 - `body` 列: 文章全体がこの文字列にマッチしたときに通知
 - `channel` 列: 通知したいチャンネル
+
+## メモ
+- [ ] config.tsはやめたらいいんじゃない?
+  - なるべく環境変数で設定したほうがいいんじゃないかな…。
+  - でも、Image指定するだけでいい感じに動くのはこれはこれでおもしろい。
+  - 柔軟に設定したい部分は基本的に `external.ruleScrapboxUrl` にあるわけだし。
+  - どうしても設定したければ環境変数でもできる。
+    - 環境変数でも、`config.ts` でもできるっていうのが管理上よくないかもしれない。
+    - というかこういうのこそScrapboxでやるべき。
+- [ ] Scrapbox以外もできたほうが楽しいよね。
+- [ ] プロジェクトが結構汚いので整理したい。
+  - eslint入れてみたけどそんなに使ってないし。
+  - docker-compose.ymlもいらなそう。
+  - コードももう少しきれいにできる。
