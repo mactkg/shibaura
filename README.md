@@ -15,20 +15,22 @@ Docker Imageに設定ファイル `config.ts` を内蔵してデプロイする�
   - `external.ruleScrapboxUrl`: (任意) マッチするルールを書いたCSVへのURLを入れるところです。後述。
 
 ### 設定ファイルをかいたら、起動してみる
-- ローカルで起動
-  - ローカルで `docker` が動くように用意してください。
-  - `make run` で動きます。`ngrok`などのツールを使ってインターネットへ公開し、試してみるといいでしょう。
-  - Docker使っていないひとは、`deno` が動くようにして、 `deno run ./src/server.ts` します。
-- Docker Containerがデプロイ出来る環境で起動
-  - `make build` でImageをBuildするので、そのままDeployすればうごきます。ポートは8080に指定してあります。
-- GCP Cloud Runで動かす
-  - MakefileにはGCPのCloud Runへデプロイするタスクが設定してあります。
-  - GCPのプロジェクトを作って、プロジェクト名をメモしておきます。
-  - 次の環境変数を設定してください。
-    - `GCP_PROJECT`=GCPのプロジェクト名
-    - `GCP_CLOUD_RUN_SERVICE_NAME`: Cloud Runのサービスの名前
-    - `GCP_IMAGE_NAME`=デプロイするDocker Imageを上げる先。 きっと `gcr.io/${GCP_PROJECT}/${GCP_CLOUD_RUN_SERVICE_NAME}`
-  - `$ make deploy_cloud_run`
+#### ローカルで起動したいひと
+- ローカルで `docker` が動くように用意してください。
+- `make run` で動きます。`ngrok`などのツールを使ってインターネットへ公開し、試してみるといいでしょう。
+- Docker使っていないひとは、`deno` が動くようにして、 `deno run ./src/server.ts` します。
+
+### Docker Containerがデプロイ出来る環境で起動したいひと
+- `make build` でImageをBuildするので、そのままDeployすればうごきます。ポートは8080に指定してあります。
+
+### GCP Cloud Runで起動したいひと（筆者のやりかた）
+- MakefileにはGCPのCloud Runへデプロイするタスクが設定してあります。これを使えば、Cloud Runにデプロイできます。
+- GCPのプロジェクトを作って、プロジェクト名をメモしておきます。
+- 次の環境変数を設定してください。
+  - `GCP_PROJECT`=GCPのプロジェクト名
+  - `GCP_CLOUD_RUN_SERVICE_NAME`: Cloud Runのサービスの名前
+  - `GCP_IMAGE_NAME`=デプロイするDocker Imageを上げる先。 きっと `gcr.io/${GCP_PROJECT}/${GCP_CLOUD_RUN_SERVICE_NAME}`
+- `$ make deploy_cloud_run`
 
 ## 処理ルールについて
 基本 [june29/takanawa](https://github.com/june29/takanawa) のように動作しますが、処理ルールの書き方が違います。
