@@ -23,11 +23,14 @@ export function App (config: Config | AppConfig): Dinatra {
         await config.getConfig() // refetch config
       }
 
+      console.debug(`Recieved ${params.attachments.length} notification(s)\n`)
       const results = await Promise.all(params.attachments.flatMap(async attachment => {
         const { title, rawText: diff } = attachment
+        console.debug(`* Start proessing: ${title}\n`)
         const body = await fetchPageText(buildPageURL(config.scrapbox.host, config.scrapbox.project, title), config.scrapbox.cookie)
+        console.debug(`diff: ${diff.length} chars, body: ${body.length} chars\n`)
         const channels = matcher(title, body, diff)
-        console.debug(`${channels.length} matches found: ${channels} for ${title}\n`)
+        console.debug(`${channels.length} match(es) found: ${channels} for ${title}\n`)
 
         await Promise.all(channels.map(async ch => {
           const url = config.slack ? config.slack.webhook : 'https://httpbin.org/post'
