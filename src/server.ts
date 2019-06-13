@@ -30,7 +30,7 @@ export function App (config: Config | AppConfig): Dinatra {
 
         await Promise.all(channels.map(async ch => {
           const url = config.slack ? config.slack.webhook : 'https://httpbin.org/post'
-          await postToSlack(url, { attachment, channel: ch })
+          await postToSlack(url, attachment, Object.assign({}, { channel: ch , username: "Shibaura Scrapbox", icon_emoji: ":scrapbox:" }, config.slack.options ))
         }))
 
         return { title, channels }

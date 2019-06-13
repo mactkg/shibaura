@@ -1,7 +1,7 @@
-export async function postToSlack (url: string, options: {attachment: {}, channel?: string}) {
+export async function postToSlack (url: string, attachment: {}, options: {}) {
   const body = JSON.stringify({
-    attachments: [options.attachment],
-    channel: options.channel
+    attachments: [attachment],
+    ...options
   })
 
   const response = await fetch(url, {

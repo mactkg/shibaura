@@ -14,6 +14,7 @@ export interface AppConfig {
   };
   slack?: {
     webhook: string;
+    options?: object;
   };
   rules?: Rule[];
   external?: {

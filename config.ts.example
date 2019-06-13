@@ -11,7 +11,11 @@ const config: AppConfig = {
         cookie: env["SCRAPBOX_COOKIE"] || ""
     },
     slack: {
-        webhook: env["SLACK_WEBHOOK"] || ''
+        webhook: env["SLACK_WEBHOOK"] || '',
+        options: {
+          // https://api.slack.com/docs/message-formatting
+          name: "Shibaura"
+        }
     },
     external: {}
 }
