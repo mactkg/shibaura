@@ -13,6 +13,7 @@ import { fetchPageText, buildPageURL } from './scrapbox.ts'
 export function App (config: Config | AppConfig): Dinatra {
   const matcher = useMatcher(config.rules)
   const handlers = [
+    get('/', () => 200),
     post('/scrapbox', async ({ params }) : Promise<number | Response> => {
       if (!(params.attachments instanceof Array)) {
         return 400
